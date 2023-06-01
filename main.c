@@ -3,7 +3,37 @@
 #include <stdbool.h>
 #include <string.h>
 
-typedef void (*ActionFunc)(void);
+int isBracket(char c) {
+    return (c == '(' || c == ')' || c == '[' || c == ']' || c == '{' || c == '}');
+}
+
+void printTokens(const char *str) {
+    size_t len = strlen(str);
+    for (size_t i = 0; i < len; i++) {
+        switch (str[i]) {
+            case ' ':
+            case '\t':
+                continue;  // Ignore whitespace characters
+            case '(':
+            case ')':
+            case '[':
+            case ']':
+            case '{':
+            case '}':
+                printf("[Token: %c]", str[i]);
+                break;
+            default:
+                printf("[Token: ");
+                while (str[i] != '\0' && !isBracket(str[i]) && str[i] != ' ') {
+                    printf("%c", str[i]);
+                    i++;
+                }
+                printf("]");
+                i--;  // Decrement i to account for the character after the token
+        }
+    }
+    printf("\n");
+}
 
 void handle_text() {
     printf("Text\n");
@@ -72,7 +102,7 @@ void process_line(char* line) {
 
         // Code mode
         case Code:
-            printf("Code: %s\n", line);
+            printTokens(line);
             break;
     }
 }
@@ -93,11 +123,13 @@ int main(int argc, char* argv[]) {
     printf("Processing file: %s\n", argv[1]);
 
     while (fgets(line, sizeof(line), file)) {
+
         // Remove trailing newline character
         line[strcspn(line, "\n")] = '\0';
 
         // Process the line
         process_line(line);
+
     }
 
     fclose(file);
