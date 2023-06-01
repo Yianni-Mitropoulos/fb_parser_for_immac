@@ -1,0 +1,12 @@
+# Text
+The purpose of this file is ...
+
+# Import
+foo
+bar
+
+# Code
+(Function) [dops :: (Put) 1-2 sz := ?]
+| (-< sum X Y)
+| prd sum (>= X) (>= Y)
+|     dif (>= X) (>= Y)
