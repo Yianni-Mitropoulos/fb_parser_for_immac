@@ -29,15 +29,17 @@ void syntax_error(char* error_msg) {
 void printTokens(const char *str) {
     int i = -1;
     char c;
+    get_next_character(i, c)
     while (1) {
-        get_next_character(i, c)
         switch (c) {
             case '\0':
                 goto printTokensFinalize;
             case_whitespace
-                continue;  // Ignore whitespace characters
+                get_next_character(i, c)
+                break;
             case_special_char
                 printf("[Token: %c]", c);
+                get_next_character(i, c)
                 break;
             case ':':
                 printf("[Token: %c", c);
@@ -47,6 +49,7 @@ void printTokens(const char *str) {
                 } else {
                     syntax_error("After a colon, there needs to be one of the following characters: {':','=',' ',}");
                 }
+                get_next_character(i, c)
                 break;
             default:
                 printf("[Token: ");
@@ -112,7 +115,7 @@ void process_line(char* line) {
         }
 
         // Throw a syntax error if no such keyword exists
-        syntax_error("Unrecognized Keyword");
+        syntax_error("Unrecognized keyword");
     }
 
     // Based on the current mode, choose an appropriate action
@@ -145,7 +148,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    char line[100];
+    char line[257];
     FILE* file = fopen(argv[1], "r");
     if (file == NULL) {
         printf("Error opening file: %s\n", argv[1]);
