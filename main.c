@@ -27,6 +27,7 @@ void syntax_error(char* error_msg) {
 }
 
 void printTokens(const char *str) {
+    int flag;
     int i = -1;
     char c;
     get_next_character(i, c)
@@ -38,25 +39,48 @@ void printTokens(const char *str) {
                 get_next_character(i, c)
                 break;
             case_special_char
-                printf("[Token: %c]", c);
+                printf("[%c]", c);
                 get_next_character(i, c)
                 break;
             case ':':
-                printf("[Token: %c", c);
                 get_next_character(i, c)
                 if (c == ':' || c == '=' || c == ' ') {
-                    printf("%c]", c);
-                } else {
-                    syntax_error("After a colon, there needs to be one of the following characters: {':','=',' ',}");
+                    printf("[:%c]", c);
+                } else if (c == '/') {
+                    goto printTokensFinalize;
+                } {
+                    syntax_error("After a colon, there needs to be one of the following characters: {'/',':','=',' ',}");
                 }
                 get_next_character(i, c)
                 break;
+            case '"':
+                printf("[String: ");
+                flag = 0;
+                while (1) {
+                    get_next_character(i, c)
+                    switch (c) {
+                        case '\0':
+                            syntax_error("Unclosed string literal");
+                        case '"':
+                            flag = 1;
+                            break;
+                        default:
+                            printf("%c", c);
+                    }
+                    if (flag) {
+                        get_next_character(i, c)
+                        break;
+                    }
+                }
+                printf("]");
+                break;
             default:
                 printf("[Token: ");
-                int flag = 0;
+                flag = 0;
                 while (1) {
                     switch (c) {
                         case '\0':
+                        case '"':
                         case_whitespace
                         case_special_char
                             flag = 1;

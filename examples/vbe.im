@@ -7,5 +7,6 @@ Hello
 Hello
 
 # Code
-foo (lol yes) 
-bar wow
+:/ This is a comment
+foo (lol yes) :/ Also a comment
+bar "Hello, world!" wow
