@@ -3,35 +3,74 @@
 #include <stdbool.h>
 #include <string.h>
 
-int isBracket(char c) {
-    return (c == '(' || c == ')' || c == '[' || c == ']' || c == '{' || c == '}');
+#define case_whitespace \
+    case ' ': \
+    case '\t':
+
+#define case_special_char \
+    case '(': \
+    case ')': \
+    case '[': \
+    case ']': \
+    case '{': \
+    case '}': 
+
+#define get_next_character(i, c) \
+    i++; \
+    c = str[i];
+
+int line_number = 0;
+
+void syntax_error(char* error_msg) {
+    printf("Syntax error at line %d: %s", line_number, error_msg);
+    exit(1);
 }
 
 void printTokens(const char *str) {
-    size_t len = strlen(str);
-    for (size_t i = 0; i < len; i++) {
-        switch (str[i]) {
-            case ' ':
-            case '\t':
+    int i = -1;
+    char c;
+    while (1) {
+        get_next_character(i, c)
+        switch (c) {
+            case '\0':
+                goto printTokensFinalize;
+            case_whitespace
                 continue;  // Ignore whitespace characters
-            case '(':
-            case ')':
-            case '[':
-            case ']':
-            case '{':
-            case '}':
-                printf("[Token: %c]", str[i]);
+            case_special_char
+                printf("[Token: %c]", c);
+                break;
+            case ':':
+                printf("[Token: %c", c);
+                get_next_character(i, c)
+                if (c == ':' || c == '=' || c == ' ') {
+                    printf("%c]", c);
+                } else {
+                    syntax_error("After a colon, there needs to be one of the following characters: {':','=',' ',}");
+                }
                 break;
             default:
                 printf("[Token: ");
-                while (str[i] != '\0' && !isBracket(str[i]) && str[i] != ' ') {
-                    printf("%c", str[i]);
-                    i++;
+                int flag = 0;
+                while (1) {
+                    switch (c) {
+                        case '\0':
+                        case_whitespace
+                        case_special_char
+                            flag = 1;
+                            break;
+                        default:
+                            printf("%c", c);
+                    }
+                    if (flag) {
+                        break;
+                    } else {
+                        get_next_character(i, c)
+                    }
                 }
                 printf("]");
-                i--;  // Decrement i to account for the character after the token
         }
     }
+    printTokensFinalize:
     printf("\n");
 }
 
@@ -41,13 +80,6 @@ void handle_text() {
 
 void handle_import() {
     printf("Import\n");
-}
-
-int line_number = 0;
-
-void syntax_error(char* error_msg) {
-    printf("Syntax error at line %d: %s", line_number, error_msg);
-    exit(1);
 }
 
 enum Mode {Undefined, Text, Import, Code};
